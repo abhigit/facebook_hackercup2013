@@ -25,7 +25,9 @@ object find_min extends App {
     val c = Integer.parseInt(abcr(2))
     val r = Integer.parseInt(abcr(3))
 
-    // need only 2k+1 elements
+    // need only 2k+1 elements as after first k elemnts remaining k+1 just repeat infinitely
+	// so we need to get calculated values for only first 2k+1 or n index, whichever is smaller
+
     val size = if (2 * k + 1 > n) n else 2 * k + 1
     val arr: Array[Int] = new Array[Int](size)
     arr(0) = a
@@ -34,39 +36,39 @@ object find_min extends App {
     for (i <- 1 until k) {
       arr(i) = (b * arr(i - 1) + c) % r
     }
-    println(arr.mkString(" "))
-    val map = (collection.mutable.Map() ++
-      (arr.filter(a => a != 0).groupBy[Int](x => x).mapValues(x => x.size))).withDefaultValue(0)
-    println(map)
-    val v = {for(i <- 1 to k) yield i }.toSet
+	// rest unknown initially set to -1
+    for (i <- k until size) {
+      arr(i) = -1 
+    }
 
+	// dirty way, to get a mutable map which stores the digit frequencies
+	// filter out 0s as we dont need them, also set default value 0 for
+	// non-existing keys
+    val map = (collection.mutable.Map() ++
+      (arr.filter(a => a != -1).groupBy[Int](x => x).mapValues(x => x.size))).withDefaultValue(0)
+
+	// to break out of the loop
+	object Done extends Exception {}
+	
+	// get next k + 1 or size - k values
     for (i <- k until size) {
       var j = 0
       while (map(j) > 0) j += 1
-
-      for( a <- v) if(map(a) <= 0 )
-
-      arr(i) = j
-      if(map(arr(i-k)) > 0) map(arr(i - k)) = map(arr(i - k)) - 1
+	  try {
+      	for( a <- 0 to k) {
+	  		if(map(a) <= 0 ){
+      			arr(i) = j
+				throw Done
+			}
+	  	}
+	  }catch {
+	  	case Done => None
+	  }
       map(j) =  1
+      map(arr(i - k)) = map(arr(i - k)) - 1
     }
-    println(map)
-    println(arr.mkString(" "))
-    println("Case #" + (i) + ": " + arr.view(k,size)((n-k)%k))
+	var idx =  k + (n-k-1)%(k+1)
+    println("Case #" + (i) + ": " + arr(idx))
   }
-
-  //  def find_next(size: Int, k: Int, arr: Array[Int]): Int = {
-  //    val map = (collection.mutable.Map() ++ (arr.filter(a => a == -1).groupBy[Int](x => x).mapValues(x => x.size))).withDefaultValue(0)
-  //
-  //    for (i <- k until size) {
-  //      var j = 0
-  //      while(map(j) > 0) j += 1
-  //      arr(i) = j
-  //      map(j) =  1
-  //      map(arr(i-k)) =map(arr(i-k)) -1
-  //    }
-  //
-  //    0
-  //  }
 
 }
