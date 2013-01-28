@@ -4,7 +4,7 @@ import java.lang.String
 /**
  * Abhijeet Parande
  * Date: 1/28/13
- * Time: 1:59 AM
+ * Time: 9:59 AM
  *
  */
 object find_min extends App {
@@ -34,7 +34,7 @@ object find_min extends App {
     for (i <- 1 until k) {
       arr(i) = (b * arr(i - 1) + c) % r
     }
-
+    println(arr.mkString(" "))
     val map = (collection.mutable.Map() ++
       (arr.filter(a => a != 0).groupBy[Int](x => x).mapValues(x => x.size))).withDefaultValue(0)
     println(map)
