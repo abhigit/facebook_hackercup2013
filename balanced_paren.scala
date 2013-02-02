@@ -20,33 +20,34 @@ object balanced_paren extends App {
 
   }
 
-  def balanced(str: String): Boolean = {
-    def prune(str: List[Char]): List[Char] = {
-      def f(cc: List[Char], out: List[Char]): List[Char] = {
-        cc match {
-          case Nil => out
-          case ':' :: tail => f(tail, ':' :: out)
-          case '(' :: tail => f(tail, '(' :: out)
-          case ')' :: tail => f(tail, ')' :: out)
-          case a :: tail => f(tail, out)
-        }
+  def balanced(str : String) : Boolean = {
+    var open = 0
+    var min =0
+    object Break extends Error
+    try{
+      for (i <- 0 until str.length) {
+         if (str(i) == '(') {
+           open +=1
+           if (i>0 && str(i-1) != ':') {
+             min +=1
+           }
+         }else if (str(i) == ')') {
+           min = math.max(0,min-1)
+           if (i>0 && str(i-1) !=':') {
+              open -= 1
+           }
+           if (open < 0) {
+             throw Break 
+           }
+         }else {
+           if(!(str(i).isLetter || str(i) == ' ' || str(i) == ':')){
+              throw Break  
+           }
+         }
       }
-      val ret = f(str, List()).reverse
-      ret
-
+    }catch {
+      case Break => open = -1 
     }
-    def balanced1(str: List[Char]): Boolean = {
-      str match {
-        case Nil => true
-        case '(' :: tail => if (!tail.isEmpty && tail.last == ')')
-          balanced1(tail.init)
-        else false
-        case ':' :: ')' :: tail => balanced1(tail)
-        case ':' :: '(' :: tail => balanced1(tail)
-        case ':' :: tail => balanced1(tail)
-        case _ => false
-      }
-    }
-    balanced1(prune(str.toList))
+     min == 0 && open >=0
   }
 }
